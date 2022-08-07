@@ -1,26 +1,52 @@
-import { FETCH_ALL, CREATE_POST, UPDATE_POST, DELETE_POST, LIKE_POST } from '../constants/actionTypes';
+import { 
+    FETCH_ALL, 
+    FETCH_BY_SEARCH, 
+    CREATE_POST, 
+    UPDATE_POST, 
+    DELETE_POST, 
+    LIKE_POST, 
+    START_LOADING, 
+    END_LOADING  
+} from '../constants/actionTypes';
 
-const reducer = (posts = [], action) => {
+const reducer = (state = { isLoading: true, posts: [] }, action) => {
     switch (action.type) {
         case FETCH_ALL:
             
-            return action.payload;
+            return {
+                ...state,
+                posts: action.payload.data,
+                currentPage: action.payload.currentPage,
+                numberOfPages: action.payload.numberOfPages
+            };
+
+        case FETCH_BY_SEARCH:
+        
+            return { ...state, posts: action.payload };
 
         case CREATE_POST:
         
-            return [...posts, action.payload];
+            return { ...state, posts: [...state.posts, action.payload]};
 
         case UPDATE_POST:
         case LIKE_POST:
     
-            return posts.map((post) => post._id === action.payload._id ? action.payload : post);
+            return { ...state, posts: state.posts.map((post) => post._id === action.payload._id ? action.payload : post)};
 
         case DELETE_POST:
 
-            return posts.filter((post) => post._id !== action.payload.id);
+            return { ...state, posts: state.posts.filter((post) => post._id !== action.payload.id)};
+
+        case START_LOADING:
+
+            return { ...state, isLoading: true };
+
+        case END_LOADING:
+
+            return { ...state, isLoading: false };
     
         default:
-            return posts;
+            return state;
     }
 }
 
