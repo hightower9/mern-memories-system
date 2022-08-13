@@ -2,6 +2,7 @@ import {
     FETCH_ALL, 
     FETCH_BY_SEARCH, 
     CREATE_POST, 
+    FETCH_POST,
     UPDATE_POST, 
     DELETE_POST, 
     LIKE_POST, 
@@ -23,6 +24,10 @@ const reducer = (state = { isLoading: true, posts: [] }, action) => {
         case FETCH_BY_SEARCH:
         
             return { ...state, posts: action.payload };
+
+        case FETCH_POST:
+    
+        return { ...state, post: action.payload };
 
         case CREATE_POST:
         

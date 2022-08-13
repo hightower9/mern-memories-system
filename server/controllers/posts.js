@@ -47,6 +47,20 @@ const createPost = async (req, res) => {
     }
 }
 
+const getPost = async (req, res) => {
+    const { id } = req.params
+
+    if(!mongoose.Types.ObjectId.isValid(id)) return res.status(404).json({ message: `No Post with id ${id}` })
+
+    try {
+        const post = await PostMessage.findById(id)
+
+        res.status(200).json(post)
+    } catch (error) {
+        res.status(409).json({ message: error.message })
+    }
+}
+
 const updatePost = async (req, res) => {
     const { id: _id } = req.params
     const post = req.body
@@ -108,6 +122,7 @@ export {
     getPosts,
     getPostsBySearch,
     createPost,
+    getPost,
     updatePost,
     deletePost,
     likePost
