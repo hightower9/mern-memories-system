@@ -5,6 +5,7 @@ import {
     FETCH_POST,
     UPDATE_POST, 
     DELETE_POST, 
+    COMMENT,
     LIKE_POST, 
     START_LOADING, 
     END_LOADING  
@@ -37,6 +38,17 @@ const reducer = (state = { isLoading: true, posts: [] }, action) => {
         case LIKE_POST:
     
             return { ...state, posts: state.posts.map((post) => post._id === action.payload._id ? action.payload : post)};
+
+        case COMMENT:
+    
+            return { ...state, posts: state.posts.map((post) => {
+                //change the post that just received a comment
+                if(post._id === action.payload._id) return action.payload;
+
+                // return all other posts normally
+                return post;
+                }) 
+            };
 
         case DELETE_POST:
 

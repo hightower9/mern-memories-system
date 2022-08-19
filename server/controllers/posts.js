@@ -2,7 +2,7 @@ import PostMessage from '../models/postMessage.js'
 import mongoose from 'mongoose'
 
 
-const getPosts = async (req, res) => {
+export const getPosts = async (req, res) => {
     const { page } = req.query
 
     try {
@@ -19,7 +19,7 @@ const getPosts = async (req, res) => {
     }
 }
 
-const getPostsBySearch = async (req, res) => {
+export const getPostsBySearch = async (req, res) => {
     const { searchQuery, tags } = req.query
     try {
         const title = new RegExp(searchQuery, 'i')
@@ -34,7 +34,7 @@ const getPostsBySearch = async (req, res) => {
     }
 }
 
-const createPost = async (req, res) => {
+export const createPost = async (req, res) => {
     const post = req.body
 
     const newPost = new PostMessage({ ...post, creator: req.userId, createdAt: new Date().toISOString() })
@@ -47,7 +47,7 @@ const createPost = async (req, res) => {
     }
 }
 
-const getPost = async (req, res) => {
+export const getPost = async (req, res) => {
     const { id } = req.params
 
     if(!mongoose.Types.ObjectId.isValid(id)) return res.status(404).json({ message: `No Post with id ${id}` })
@@ -61,7 +61,7 @@ const getPost = async (req, res) => {
     }
 }
 
-const updatePost = async (req, res) => {
+export const updatePost = async (req, res) => {
     const { id: _id } = req.params
     const post = req.body
 
@@ -76,7 +76,7 @@ const updatePost = async (req, res) => {
     }
 }
 
-const deletePost = async (req, res) => {
+export const deletePost = async (req, res) => {
     const { id: _id } = req.params
 
     if(!mongoose.Types.ObjectId.isValid(_id)) return res.status(404).json({ message: `No Post with id ${_id}` })
@@ -90,7 +90,7 @@ const deletePost = async (req, res) => {
     }
 }
 
-const likePost = async (req, res) => {
+export const likePost = async (req, res) => {
     const { id: _id } = req.params
 
     if(!req.userId) return res.json({ message: 'Unauthenticated' })
@@ -118,12 +118,23 @@ const likePost = async (req, res) => {
     }
 }
 
-export {
-    getPosts,
-    getPostsBySearch,
-    createPost,
-    getPost,
-    updatePost,
-    deletePost,
-    likePost
+export const commentPost = async (req, res) => {
+    const { id } = req.params
+    const { value } = req.body
+
+    if(!req.userId) return res.json({ message: 'Unauthenticated' })
+
+    if(!mongoose.Types.ObjectId.isValid(id)) return res.status(404).json({ message: `No Post with id ${id}` })
+
+    try {
+        const post = await PostMessage.findById(id)
+
+        post.comments.push(value)
+
+        const updatedPost = await PostMessage.findByIdAndUpdate(id, post, { new: true })
+
+        res.json(updatedPost)
+    } catch (error) {
+        res.status(409).json({ message: error.message })
+    }
 }
